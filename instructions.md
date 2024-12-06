@@ -55,12 +55,40 @@ Aurora (MySQL)
 - The test class should have a main method that can be run from the command line
 - The program should take a file path as a command line argument
 - The program should submit the PDF to the Anthropic Claude API for text extraction. 
+- The api keys should be stored in the environment variables
+- A config class should be created to load the api keys from the environment variables, both in a dev and production environment
 - Store the extracted table from the PDF in a pandas dataframe
 - The dataframe should have the following columns: date, merchant, amount
 - The output of the program should print to the console
+- Use object-oriented programming to create the classes
 
-#TODO 3. Store data in database
-
-#TODO 4. Analyze data
+3. Analyzing credit card merchants and fetching information using Claude and Brave
+- Create a test class that can analyze the credit card transaction data
+- The test class should have a main method that can be run from the command line
+- The program should take a file path as a command line argument
+- Load the data from the CSV file into a pandas dataframe
+- Take an argument for the number of transactions to analyze
+- For the number of transactions to analyze, fetch the merchant information using the Brave Search API and Claude API
+- Search for the merchant name with the Brave search API
+- Inject search results into prompt
+- Answer the user's questions with Claude
+- Print the results to the console
+- Use object-oriented programming to create the classes
 
 #TODO 5. Provide insights
+
+
+# Documentation and Code Examples
+
+## User's questions
+- What is the merchant website?
+- What is the merchant's phone number?
+- What product or service matches the charges for the transactions?
+- What is the description of the product or service?
+
+## Analyzing credit card merchants
+
+Purpose: Retrieve merchant information from the merchant description field.
+
+Use the Brave Search API to retrieve merchant information. This is a code example of connecting to the Brave Search API and Anthropic Claude API:
+https://github.com/anthropics/anthropic-cookbook/blob/main/third_party/Brave/web_search_using_brave.ipynb
