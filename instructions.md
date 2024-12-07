@@ -62,6 +62,17 @@ Aurora (MySQL)
 - The output of the program should print to the console
 - Use object-oriented programming to create the classes
 
+# TODO
+Skip all types of payments in the transactions. These are going to be denoted in different ways for each credit card processor. Also need to remove charges that have corresponding credits. That would be a return. There's no need to process those.
+
+# TODO: 
+It looks like each credit card processor is going to have their own formatting for merchants. For example in Chase there's a merchant and then sometimes there's an asterisk with more detail about what the charge is for. We would need to parse that using a regex and break that into multiple fields for storage. The merchant and then the extra info. That way later on when we're parsing additional statements we will be able to create a set of rules on how to parse each statement. Could get messy but that's the way it looks right now. 
+
+# TODO 2.b Store data in database
+- Store client info (based on email)
+- Store statement info (statement date, statement id?)
+- Store transaction info (date, merchant, amount)
+
 3. Analyzing credit card merchants and fetching information using Claude and Brave
 - Create a test class that can analyze the credit card transaction data
 - The test class should have a main method that can be run from the command line
@@ -74,6 +85,10 @@ Aurora (MySQL)
 - Answer the user's questions with Claude
 - Print the results to the console
 - Use object-oriented programming to create the classes
+
+# TODO 4. Store results in database
+- Store merchant info
+- Storing every analysis will not be scalable, nor will it be useful. We need to store the analysis a document that can be emailed to the user. 
 
 #TODO 5. Provide insights
 

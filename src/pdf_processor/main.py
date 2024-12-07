@@ -2,8 +2,11 @@ import argparse
 import os
 from config import Config
 from pdf_extractor import PDFExtractor, PDFExtractionError
+from transaction_processor import TransactionProcessor
 from typing import Dict, Any
 import sys
+import json
+import asyncio
 
 def process_pdf(file_path: str, notify_email: str) -> Dict[str, Any]:
     try:
@@ -17,11 +20,37 @@ def process_pdf(file_path: str, notify_email: str) -> Dict[str, Any]:
         # Create DataFrame
         df = extractor.create_dataframe(transactions)
         
+        # Process transactions asynchronously
+        processor = TransactionProcessor()
+        merchant_results = asyncio.run(processor.process_transactions(transactions))
+        
+        # Build response with analysis results
         return {
             "success": True,
             "num_transactions": len(transactions),
             "email": notify_email,
-            "transactions": transactions
+            "transactions": transactions,
+            "merchant_analysis": [
+                {
+                    "merchant_code": result.merchant_code,
+                    "merchant_name": result.merchant,
+                    "website": result.website,
+                    "phone": result.phone,
+                    "product_description": result.product_description,
+                    "price_range": result.price_range,
+                    "likely_purchases": [
+                        {
+                            "name": purchase.name,
+                            "price": purchase.price,
+                            "description": purchase.description,
+                            "confidence": purchase.confidence_score,
+                            "reason": purchase.match_reason
+                        }
+                        for purchase in result.likely_purchases
+                    ]
+                }
+                for result in merchant_results
+            ]
         }
         
     except PDFExtractionError as e:

@@ -76,6 +76,12 @@ This application is designed for personal use. Please be cautious when handling 
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## Acknowledgments
+
+- [Anthropic](https://www.anthropic.com/) for the API that powers the AI analysis
+- [Brave](https://brave.com/) for the API that powers the search functionality
+- [Anthropic](https://www.anthropic.com/) for the PDF support
+
 ## Contact
 
 Scott Alan Turner - [@scottalanturner](https://twitter.com/scottalanturner)
