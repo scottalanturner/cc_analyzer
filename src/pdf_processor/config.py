@@ -22,3 +22,13 @@ class Config:
         
         if not self.anthropic_api_key:
             raise ValueError("ANTHROPIC_API_KEY environment variable is not set") 
+        
+        # Model configuration
+        self.anthropic_model = os.getenv('ANTHROPIC_MODEL')
+        
+        # Directories
+        self.base_dir = Path(__file__).parent.parent.parent
+        self.upload_dir = self.base_dir / 'uploads'
+        
+        # Create uploads directory if it doesn't exist
+        self.upload_dir.mkdir(parents=True, exist_ok=True)

@@ -1,58 +1,70 @@
 import argparse
 import os
 from config import Config
-from pdf_extractor import PDFExtractor
+from pdf_extractor import PDFExtractor, PDFExtractionError
+from typing import Dict, Any
+import sys
 
-def main():
-    # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Extract transactions from PDF credit card statement')
-    parser.add_argument('file_name', help='Name of the PDF file in uploads directory')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Show verbose output')
-    args = parser.parse_args()
-    
+def process_pdf(file_path: str, notify_email: str) -> Dict[str, Any]:
     try:
         # Initialize config and extractor
         config = Config()
         extractor = PDFExtractor(config)
         
-        # Construct full file path
-        file_path = config.upload_dir / args.file_name
-        
-        if args.verbose:
-            print(f"\nFile details:")
-            print(f"Full path: {file_path}")
-            print(f"File size: {os.path.getsize(file_path)} bytes")
-            print(f"File exists: {os.path.exists(file_path)}")
-        
-        # Check if file exists
-        if not file_path.exists():
-            raise FileNotFoundError(f"PDF file not found: {file_path}")
-        
-        # Process the PDF
-        print(f"Processing PDF file: {file_path}")
-        
-        # Extract text from PDF
-        pdf_text = extractor.extract_text_from_pdf(file_path)
-        print("PDF text extracted successfully")
-        
-        if args.verbose:
-            print("\nExtracted text preview (first 500 chars):")
-            print(pdf_text[:500])
-        
-        # Extract transactions using Claude
-        transactions = extractor.extract_transactions(pdf_text)
-        print(f"Found {len(transactions)} transactions")
+        # Extract transactions directly from PDF
+        transactions = extractor.extract_transactions_from_pdf(file_path)
         
         # Create DataFrame
         df = extractor.create_dataframe(transactions)
-        print("\nExtracted Transactions:")
-        print(df.to_string())
         
+        return {
+            "success": True,
+            "num_transactions": len(transactions),
+            "email": notify_email,
+            "transactions": transactions
+        }
+        
+    except PDFExtractionError as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"Unexpected error: {str(e)}"
+        }
+
+# Lambda handler
+def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
+    file_path = event['file_path']
+    notify_email = event['notify_email']
+    
+    return process_pdf(file_path, notify_email)
+
+# Local development entry point
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('file_name', help='Name of the PDF file in uploads directory')
+    parser.add_argument('--email', help='Email to notify when complete')
+    parser.add_argument('-v', '--verbose', action='store_true')
+    args = parser.parse_args()
+    
+    try:
+        result = process_pdf(args.file_name, args.email)
+        
+        if not result["success"]:
+            print(f"Error: {result['error']}")
+            sys.exit(1)
+            
+        print(f"Processing complete: {result}")
+        
+    except KeyboardInterrupt:
+        print("\nProcess interrupted by user")
+        sys.exit(1)
     except Exception as e:
         print(f"Error: {str(e)}")
-        return 1
-    
-    return 0
-
-if __name__ == "__main__":
-    exit(main()) 
+        if args.verbose:
+            import traceback
+            traceback.print_exc()
+        sys.exit(1) 
